@@ -1,0 +1,18 @@
+2026-09-14T19:54:20.015Z HYPERVISOR: Release 0.2.25-amd64/Linux (tag 2023010200)
+2026-09-14T19:54:20.015Z HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 59665.
+2026-09-14T19:54:20.022Z HYPERVISOR: exec_cmd: hypervisor version 
+2026-09-14T19:54:20.023Z HYPERVISOR: exec_cmd: hypervisor working_dir /home/dino/GNS3/projects/topologia3/project-files/dynamips 
+2026-09-14T19:54:20.023Z GENERAL: working_dir=/home/dino/GNS3/projects/topologia3/project-files/dynamips
+2026-09-14T19:54:20.023Z HYPERVISOR: exec_cmd: ethsw create Switch1 
+2026-09-14T19:54:20.640Z HYPERVISOR: exec_cmd: nio create_udp udp-e6cc6eb2-97f1-48c4-946c-aac4986355d2 10001 127.0.0.1 10000 
+2026-09-14T19:54:20.641Z HYPERVISOR: exec_cmd: ethsw add_nio Switch1 udp-e6cc6eb2-97f1-48c4-946c-aac4986355d2 
+2026-09-14T19:54:20.657Z HYPERVISOR: exec_cmd: ethsw set_access_port Switch1 udp-e6cc6eb2-97f1-48c4-946c-aac4986355d2 1 
+2026-09-14T19:54:54.816Z HYPERVISOR: exec_cmd: nio create_udp udp-4648f0a0-9cea-497c-a798-59226814c8e1 10017 127.0.0.1 10016 
+2026-09-14T19:54:54.817Z HYPERVISOR: exec_cmd: ethsw add_nio Switch1 udp-4648f0a0-9cea-497c-a798-59226814c8e1 
+2026-09-14T19:54:54.818Z HYPERVISOR: exec_cmd: ethsw set_access_port Switch1 udp-4648f0a0-9cea-497c-a798-59226814c8e1 1 
+2026-09-14T19:54:57.358Z HYPERVISOR: exec_cmd: nio create_udp udp-7c2ad4c5-84e8-41d5-a429-d96dad9ef8bc 10019 127.0.0.1 10018 
+2026-09-14T19:54:57.358Z HYPERVISOR: exec_cmd: ethsw add_nio Switch1 udp-7c2ad4c5-84e8-41d5-a429-d96dad9ef8bc 
+2026-09-14T19:54:57.368Z HYPERVISOR: exec_cmd: ethsw set_access_port Switch1 udp-7c2ad4c5-84e8-41d5-a429-d96dad9ef8bc 1 
+2026-09-14T19:55:00.261Z HYPERVISOR: exec_cmd: nio create_udp udp-827b2e23-c628-4a04-a9b8-38b3ca55eb25 10021 127.0.0.1 10020 
+2026-09-14T19:55:00.261Z HYPERVISOR: exec_cmd: ethsw add_nio Switch1 udp-827b2e23-c628-4a04-a9b8-38b3ca55eb25 
+2026-09-14T19:55:00.279Z HYPERVISOR: exec_cmd: ethsw set_access_port Switch1 udp-827b2e23-c628-4a04-a9b8-38b3ca55eb25 1 

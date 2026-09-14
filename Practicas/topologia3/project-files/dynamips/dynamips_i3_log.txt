@@ -1,0 +1,65 @@
+2026-09-14T19:54:19.967Z HYPERVISOR: Release 0.2.25-amd64/Linux (tag 2023010200)
+2026-09-14T19:54:19.967Z HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 36613.
+2026-09-14T19:54:19.975Z HYPERVISOR: exec_cmd: hypervisor version 
+2026-09-14T19:54:19.976Z HYPERVISOR: exec_cmd: hypervisor working_dir /home/dino/GNS3/projects/topologia3/project-files/dynamips 
+2026-09-14T19:54:19.976Z GENERAL: working_dir=/home/dino/GNS3/projects/topologia3/project-files/dynamips
+2026-09-14T19:54:19.976Z HYPERVISOR: exec_cmd: hypervisor working_dir /home/dino/GNS3/projects/topologia3/project-files/dynamips/971fc51e-718b-4cab-accb-fd1684ec417a 
+2026-09-14T19:54:19.976Z GENERAL: working_dir=/home/dino/GNS3/projects/topologia3/project-files/dynamips/971fc51e-718b-4cab-accb-fd1684ec417a
+2026-09-14T19:54:19.976Z HYPERVISOR: exec_cmd: vm create R3 3 c7200 
+2026-09-14T19:54:19.976Z VM: VM R3 created.
+2026-09-14T19:54:19.976Z HYPERVISOR: exec_cmd: vm set_con_tcp_port R3 5002 
+2026-09-14T19:54:19.977Z HYPERVISOR: exec_cmd: c7200 get_mac_addr R3 
+2026-09-14T19:54:19.977Z HYPERVISOR: exec_cmd: vm get_status R3 
+2026-09-14T19:54:19.977Z HYPERVISOR: exec_cmd: vm slot_add_binding R3 0 0 C7200-IO-FE 
+2026-09-14T19:54:19.978Z HYPERVISOR: exec_cmd: vm set_disk0 R3 0 
+2026-09-14T19:54:19.979Z HYPERVISOR: exec_cmd: vm get_status R3 
+2026-09-14T19:54:19.979Z HYPERVISOR: exec_cmd: vm set_idle_pc R3 0x606df838 
+2026-09-14T19:54:19.979Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T19:54:19.980Z HYPERVISOR: exec_cmd: c7200 set_mac_addr R3 ca03.3c9d.0000 
+2026-09-14T19:54:19.980Z HYPERVISOR: exec_cmd: vm set_nvram R3 512 
+2026-09-14T19:54:19.981Z HYPERVISOR: exec_cmd: vm set_ram R3 512 
+2026-09-14T19:54:19.981Z HYPERVISOR: exec_cmd: vm get_status R3 
+2026-09-14T19:54:19.981Z HYPERVISOR: exec_cmd: vm slot_add_binding R3 1 0 PA-GE 
+2026-09-14T19:54:19.981Z HYPERVISOR: exec_cmd: vm get_status R3 
+2026-09-14T19:54:19.981Z HYPERVISOR: exec_cmd: vm slot_add_binding R3 2 0 PA-4T+ 
+2026-09-14T19:54:32.465Z HYPERVISOR: exec_cmd: nio create_udp udp-a873c623-bbeb-46bf-87a3-ff9238ca1b22 10014 127.0.0.1 10015 
+2026-09-14T19:54:32.671Z HYPERVISOR: exec_cmd: vm slot_add_nio_binding R3 2 1 udp-a873c623-bbeb-46bf-87a3-ff9238ca1b22 
+2026-09-14T19:54:32.672Z HYPERVISOR: exec_cmd: vm get_status R3 
+2026-09-14T19:54:42.525Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T19:55:20.454Z HYPERVISOR: exec_cmd: nio create_udp udp-a927a1d8-afba-446d-ab8b-6f961f5fbdac 10032 127.0.0.1 10033 
+2026-09-14T19:55:20.455Z HYPERVISOR: exec_cmd: vm slot_add_nio_binding R3 1 0 udp-a927a1d8-afba-446d-ab8b-6f961f5fbdac 
+2026-09-14T19:55:20.455Z HYPERVISOR: exec_cmd: vm get_status R3 
+2026-09-14T19:55:24.129Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T20:10:58.948Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T20:11:05.543Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T20:11:06.972Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T20:11:11.496Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T20:11:56.428Z HYPERVISOR: exec_cmd: vm create Ghost 0 c7200 
+2026-09-14T20:11:56.428Z VM: VM Ghost created.
+2026-09-14T20:11:56.428Z HYPERVISOR: exec_cmd: vm set_ios Ghost /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T20:11:56.429Z HYPERVISOR: exec_cmd: vm set_ghost_status Ghost 1 
+2026-09-14T20:11:56.429Z HYPERVISOR: exec_cmd: vm set_ghost_file Ghost /home/dino/GNS3/projects/topologia3/project-files/dynamips/c7200-adventerprisek9-mz.124-24.T5.image-512.ghost 
+2026-09-14T20:11:56.429Z HYPERVISOR: exec_cmd: vm set_ram Ghost 512 
+2026-09-14T20:11:56.429Z HYPERVISOR: exec_cmd: vm get_status Ghost 
+2026-09-14T20:11:56.430Z HYPERVISOR: exec_cmd: vm set_config Ghost configs/i0_startup-config.cfg 
+2026-09-14T20:11:56.430Z HYPERVISOR: exec_cmd: vm start Ghost 
+2026-09-14T20:11:56.675Z HYPERVISOR: exec_cmd: vm get_status Ghost 
+2026-09-14T20:11:56.676Z HYPERVISOR: exec_cmd: vm stop Ghost 
+2026-09-14T20:11:56.884Z VM: VM Ghost shutdown.
+2026-09-14T20:11:56.885Z HYPERVISOR: exec_cmd: vm extract_config Ghost 
+2026-09-14T20:11:56.886Z HYPERVISOR: exec_cmd: vm clean_delete Ghost 
+2026-09-14T20:11:56.886Z VM: VM Ghost destroyed.
+2026-09-14T20:11:56.887Z HYPERVISOR: exec_cmd: vm set_ghost_status R3 2 
+2026-09-14T20:11:56.888Z HYPERVISOR: exec_cmd: vm set_ghost_file R3 /home/dino/GNS3/projects/topologia3/project-files/dynamips/c7200-adventerprisek9-mz.124-24.T5.image-512.ghost 
+2026-09-14T20:11:56.888Z HYPERVISOR: exec_cmd: vm get_status R3 
+2026-09-14T20:11:56.889Z HYPERVISOR: exec_cmd: vm set_config R3 configs/i3_startup-config.cfg 
+2026-09-14T20:11:56.889Z HYPERVISOR: exec_cmd: vm start R3 
+2026-09-14T20:12:27.125Z HYPERVISOR: exec_cmd: vm extract_config R3 
+2026-09-14T20:16:27.142Z HYPERVISOR: exec_cmd: vm extract_config R3 
+2026-09-14T20:19:56.985Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T20:21:54.164Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T20:35:12.099Z HYPERVISOR: exec_cmd: vm set_ghost_status R3 2 
+2026-09-14T20:35:12.100Z HYPERVISOR: exec_cmd: vm set_ghost_file R3 /home/dino/GNS3/projects/topologia3/project-files/dynamips/c7200-adventerprisek9-mz.124-24.T5.image-512.ghost 
+2026-09-14T20:35:12.100Z HYPERVISOR: exec_cmd: vm get_status R3 
+2026-09-14T20:54:49.268Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 
+2026-09-14T20:54:50.607Z HYPERVISOR: exec_cmd: vm set_ios R3 /home/dino/GNS3/images/IOS/c7200-adventerprisek9-mz.124-24.T5.image 

@@ -1,0 +1,117 @@
+# ------ Router 1 --------
+
+enable
+conf term
+hostname RT-01
+interface g1/0
+ ip address 192.168.3.254 255.255.255.0
+ ip helper-address 192.168.1.1
+ no shut
+exit
+interface s2/0
+ ip address 192.168.2.1 255.255.255.252
+ clock rate 64000
+ no shut
+exit
+ip route 192.168.1.0 255.255.255.0 192.168.2.2
+ip route 192.168.4.0 255.255.255.252 192.168.2.2
+ip route 192.168.5.0 255.255.255.0 192.168.2.2
+end
+wr
+
+
+# ---- Router 2 -----------
+
+enable
+conf term
+hostname RT-02
+interface s2/0
+ ip address 192.168.2.2 255.255.255.252
+ no shut
+exit
+interface s2/1
+ ip address 192.168.4.1 255.255.255.252
+ clock rate 64000
+ no shut
+exit
+ip route 192.168.3.0 255.255.255.0 192.168.2.1
+ip route 192.168.1.0 255.255.255.0 192.168.4.2
+ip route 192.168.5.0 255.255.255.0 192.168.4.2
+end
+wr
+
+
+# --------- router 3 -----------------
+
+enable
+conf term
+hostname RT-03
+interface s2/1
+ ip address 192.168.4.2 255.255.255.252
+ no shut
+exit
+interface g1/0
+ no shut
+exit
+interface g1/0.100
+ encapsulation dot1Q 100
+ ip address 192.168.1.254 255.255.255.0
+exit
+interface g1/0.200
+ encapsulation dot1Q 200
+ ip address 192.168.5.254 255.255.255.0
+ ip helper-address 192.168.1.1
+exit
+ip route 192.168.3.0 255.255.255.0 192.168.4.1
+ip route 192.168.2.0 255.255.255.252 192.168.4.1
+end
+wr
+
+
+
+
+
+
+SWITCH 2 
+
+
+e0 -> access VLAN 100   (server-dhcp)
+e1 -> access VLAN 100   (nginx-1)
+e2 -> access VLAN 100   (nginx-2)
+e3 -> access VLAN 200   (PC4)
+puerto hacia R3 -> trunk, permitiendo VLAN 100 y 200
+
+
+
+
+root@server-dhcp:/# cat /etc/dhcp/dhcpd.conf
+authoritative;
+
+subnet 192.168.1.0 netmask 255.255.255.0
+{
+}
+
+subnet 192.168.3.0 netmask 255.255.255.0
+{
+    range 192.168.3.1 192.168.3.100;
+    option routers 192.168.3.254;
+    option domain-name-servers 192.168.3.254;
+    option domain-name "mexas.mx";
+    option broadcast-address 192.168.3.255;
+    default-lease-time 600;
+    max-lease-time 7200;
+}
+
+subnet 192.168.5.0 netmask 255.255.255.0
+{
+    range 192.168.5.1 192.168.5.100;
+    option routers 192.168.5.254;
+    option domain-name-servers 192.168.5.254;
+    option domain-name "mexas.mx";
+    option broadcast-address 192.168.5.255;
+    default-lease-time 600;
+    max-lease-time 7200;
+}
+
+
+
