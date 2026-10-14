@@ -71,9 +71,13 @@ iface eth0 inet static
 conf term
 
 interface gig1/0
+no shut
+exit
+
+interface gig1/0.10
+encapsulation dot1Q 10
 ip address 10.10.10.254 255.255.255.0
 ip helper-address 20.20.20.1
-no shut
 exit
 
 interface ser2/0
@@ -101,8 +105,8 @@ exit
 
 ip domain-name isai.mx
 service password-encryption
-username Cisco secret Cisco123
-enable secret Cisco123
+username dino secret dino123
+enable secret dino123
 crypto key generate rsa
 
 
@@ -119,11 +123,12 @@ login local
 transport input ssh
 exit
 line con 0
-password Cisco123
+password dino123
 login
 exit
 
 do wr
+
 
 
 
@@ -155,8 +160,8 @@ exit
 
 ip domain-name isai.mx
 service password-encryption
-username Cisco secret Cisco123
-enable secret Cisco123
+username dino secret dino123
+enable secret dino123
 crypto key generate rsa
 
 
@@ -174,20 +179,16 @@ login local
 transport input ssh
 exit
 line con 0
-password Cisco123
+password dino123
 login
 exit
 
 do wr
 
 
-
-
-
 ---------- R3 ----------
 
 conf term
-
 
 interface ser2/1
 ip address 192.168.45.6 255.255.255.252
@@ -210,8 +211,8 @@ exit
 
 ip domain-name isai.mx
 service password-encryption
-username Cisco secret Cisco123
-enable secret Cisco123
+username dino secret dino123
+enable secret dino123
 crypto key generate rsa
 
 
@@ -225,22 +226,23 @@ login local
 transport input ssh
 exit
 line con 0
-password Cisco123
+password dino123
 login
 exit
 
 do wr
 
 
-
-
-
 ---------- R4 ----------
 
 conf term
 interface gig1/0
-ip address 20.20.20.254 255.255.255.0
 no shut
+exit
+
+interface gig1/0.20
+encapsulation dot1Q 20
+ip address 20.20.20.254 255.255.255.0
 exit
 
 interface ser2/0
@@ -264,8 +266,8 @@ exit
 
 ip domain-name isai.mx
 service password-encryption
-username Cisco secret Cisco123
-enable secret Cisco123
+username dino secret dino123
+enable secret dino123
 crypto key generate rsa
 
 
@@ -283,14 +285,11 @@ login local
 transport input ssh
 exit
 line con 0
-password Cisco123
+password dino123
 login
 exit
 
 do wr
-
-
-
 
 
 ---------- R5 ----------
@@ -318,8 +317,8 @@ exit
 
 ip domain-name isai.mx
 service password-encryption
-username Cisco secret Cisco123
-enable secret Cisco123
+username dino secret dino123
+enable secret dino123
 crypto key generate rsa
 
 
@@ -333,14 +332,11 @@ login local
 transport input ssh
 exit
 line con 0
-password Cisco123
+password dino123
 login
 exit
 
 do wr
-
-
-
 
 
 ---------- R6 ----------
@@ -367,8 +363,8 @@ exit
 
 ip domain-name isai.mx
 service password-encryption
-username Cisco secret Cisco123
-enable secret Cisco123
+username dino secret dino123
+enable secret dino123
 crypto key generate rsa
 
 
@@ -382,11 +378,16 @@ login local
 transport input ssh
 exit
 line con 0
-password Cisco123
+password dino123
 login
 exit
 
 do wr
+
+
+
+
+
 
 
 
@@ -401,9 +402,9 @@ curl 20.20.20.2
 
 
 
-ssh Cisco@10.10.10.254     
-ssh Cisco@192.168.45.2     
-ssh Cisco@192.168.45.6     
-ssh Cisco@192.168.45.10  
-ssh Cisco@192.168.45.14    
-ssh Cisco@192.168.45.22
+ssh dino@10.10.10.254     
+ssh dino@192.168.45.2     
+ssh dino@192.168.45.6     
+ssh dino@192.168.45.10  
+ssh dino@192.168.45.14
+ssh dino@192.168.45.22
