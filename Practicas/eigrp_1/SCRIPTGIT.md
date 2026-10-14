@@ -1,0 +1,425 @@
+
+
+![ EIGRP](Practica01_U2_EIGRP.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------- DHCP ----------
+
+nano /etc/network/interfaces
+
+auto eth0
+iface eth0 inet static
+	address 20.20.20.1
+	netmask 255.255.255.0
+	gateway 20.20.20.254
+	
+	
+	
+	
+	
+
+
+echo "" > /etc/dhcp/dhcpd.conf
+nano /etc/dhcp/dhcpd.conf
+
+
+
+
+
+
+
+authoritative;
+
+subnet 20.20.20.0 netmask 255.255.255.0
+{
+}
+
+subnet 10.10.10.0 netmask 255.255.255.0
+{
+    range 10.10.10.11 10.10.10.100;
+    option routers 10.10.10.254;
+   # option domain-name-servers 20.20.20.254;
+    option domain-name "isai.mx";
+    option broadcast-address 10.10.10.255;
+    default-lease-time 600;
+    max-lease-time 7200;
+}
+
+
+
+
+
+
+
+service isc-dhcp-server start
+
+
+
+
+
+---------- NGINX ----------
+
+nano /etc/network/interfaces
+
+auto eth0
+iface eth0 inet static
+	address 20.20.20.2
+	netmask 255.255.255.0
+	gateway 20.20.20.254
+
+
+
+
+
+---------- R1 ----------
+
+conf term
+
+interface gig1/0
+ip address 10.10.10.254 255.255.255.0
+ip helper-address 20.20.20.1
+no shut
+exit
+
+interface ser2/0
+ip address 192.168.45.1 255.255.255.252
+clock rate 64000
+no shut
+
+
+
+interface ser2/1
+ip address 192.168.45.21 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+router eigrp 100
+no auto-summary
+network 10.10.10.0 0.0.0.255
+network 192.168.45.0 0.0.0.3
+network 192.168.45.20 0.0.0.3
+exit
+
+
+
+
+ip domain-name isai.mx
+service password-encryption
+username Cisco secret Cisco123
+enable secret Cisco123
+crypto key generate rsa
+
+
+
+
+
+
+
+
+!-------------------------
+ip ssh version 2
+line vty 0 15
+login local
+transport input ssh
+exit
+line con 0
+password Cisco123
+login
+exit
+
+do wr
+
+
+
+
+
+---------- R2 ----------
+
+conf term
+
+interface ser2/0
+ip address 192.168.45.2 255.255.255.252
+clock rate 64000
+no shut
+
+
+interface ser2/1
+ip address 192.168.45.5 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.0 0.0.0.3
+network 192.168.45.4 0.0.0.3
+exit
+
+
+
+ip domain-name isai.mx
+service password-encryption
+username Cisco secret Cisco123
+enable secret Cisco123
+crypto key generate rsa
+
+
+
+
+
+
+
+
+
+!-------------------------
+ip ssh version 2
+line vty 0 15
+login local
+transport input ssh
+exit
+line con 0
+password Cisco123
+login
+exit
+
+do wr
+
+
+
+
+
+---------- R3 ----------
+
+conf term
+
+
+interface ser2/1
+ip address 192.168.45.6 255.255.255.252
+clock rate 64000
+no shut
+
+
+
+interface ser2/0
+ip address 192.168.45.9 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.4 0.0.0.3
+network 192.168.45.8 0.0.0.3
+exit
+
+ip domain-name isai.mx
+service password-encryption
+username Cisco secret Cisco123
+enable secret Cisco123
+crypto key generate rsa
+
+
+
+
+
+!-------------------------
+ip ssh version 2
+line vty 0 15
+login local
+transport input ssh
+exit
+line con 0
+password Cisco123
+login
+exit
+
+do wr
+
+
+
+
+
+---------- R4 ----------
+
+conf term
+interface gig1/0
+ip address 20.20.20.254 255.255.255.0
+no shut
+exit
+
+interface ser2/0
+ip address 192.168.45.10 255.255.255.252
+clock rate 64000
+no shut
+
+
+interface ser2/1
+ip address 192.168.45.13 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+router eigrp 100
+no auto-summary
+network 20.20.20.0 0.0.0.255
+network 192.168.45.8 0.0.0.3
+network 192.168.45.12 0.0.0.3
+exit
+
+ip domain-name isai.mx
+service password-encryption
+username Cisco secret Cisco123
+enable secret Cisco123
+crypto key generate rsa
+
+
+
+
+
+
+
+!-------------------------
+
+
+ip ssh version 2
+line vty 0 15
+login local
+transport input ssh
+exit
+line con 0
+password Cisco123
+login
+exit
+
+do wr
+
+
+
+
+
+---------- R5 ----------
+
+conf term
+interface ser2/1
+ip address 192.168.45.14 255.255.255.252
+clock rate 64000
+no shut
+
+
+
+
+interface ser2/0
+ip address 192.168.45.17 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.12 0.0.0.3
+network 192.168.45.16 0.0.0.3
+exit
+
+ip domain-name isai.mx
+service password-encryption
+username Cisco secret Cisco123
+enable secret Cisco123
+crypto key generate rsa
+
+
+
+
+
+!-------------------------
+ip ssh version 2
+line vty 0 15
+login local
+transport input ssh
+exit
+line con 0
+password Cisco123
+login
+exit
+
+do wr
+
+
+
+
+
+---------- R6 ----------
+
+conf term
+interface ser2/0
+ip address 192.168.45.18 255.255.255.252
+clock rate 64000
+no shut
+
+
+
+interface ser2/1
+ip address 192.168.45.22 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.16 0.0.0.3
+network 192.168.45.20 0.0.0.3
+exit
+
+ip domain-name isai.mx
+service password-encryption
+username Cisco secret Cisco123
+enable secret Cisco123
+crypto key generate rsa
+
+
+
+
+
+!-------------------------
+ip ssh version 2
+line vty 0 15
+login local
+transport input ssh
+exit
+line con 0
+password Cisco123
+login
+exit
+
+do wr
+
+
+
+
+
+
+
+pin 192.168.45.1
+curl 20.20.20.2
+
+
+
+
+
+ssh Cisco@10.10.10.254     
+ssh Cisco@192.168.45.2     
+ssh Cisco@192.168.45.6     
+ssh Cisco@192.168.45.10  
+ssh Cisco@192.168.45.14    
+ssh Cisco@192.168.45.22
