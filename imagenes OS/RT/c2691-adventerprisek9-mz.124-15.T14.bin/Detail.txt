@@ -1,0 +1,2 @@
+Minimum RAM: 256MB
+Proposed idle-PC value: 0x60bcf9f8
