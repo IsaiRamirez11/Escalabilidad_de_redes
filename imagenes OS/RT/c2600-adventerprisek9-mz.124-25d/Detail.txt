@@ -1,2 +1,0 @@
-Minimum RAM: 128MB
-Proposed idle-PC value: 0x80519c48
