@@ -1,9 +1,8 @@
 # Practica conexion multiusuario
 
 ## Recursos: 
-### contenedores : https://github.com/IsaiRamirez11/Escalabilidad_de_redes/tree/main/Containers
-### drivers para windows XP : https://github.com/IsaiRamirez11/Escalabilidad_de_redes/tree/main/Drivers%20/Win%20XP
-
+### contenedores : https://github.com/IsaiRamirez11/Escalabilidad_de_redes/tree/main/Resources/Containers
+### drivers para windows XP : https://github.com/IsaiRamirez11/Escalabilidad_de_redes/tree/main/Resources/Drivers%20/Win%20XP
 
 ## Configuracion de el adaptadores ethernet fisico  
 ### es especialmente necesario configurar para que evitemos esta intermitencia de encendidio y apagado de nuestro adaptador al no asignarse una ip, por lo que nosotros se la definimos manualmente como se muestra para la PC 1 seria la siguiente 
