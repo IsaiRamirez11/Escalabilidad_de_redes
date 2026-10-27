@@ -1,0 +1,249 @@
+
+
+
+! -------------  Router 1
+
+conf ter
+
+interfa ser 2/0
+ip add 192.168.23.1 255.255.255.252
+clock rate 64000
+no shut
+
+interfa ser 2/1
+clock rate 64000
+ip add 192.168.23.5 255.255.255.252
+no shut 
+
+router rip 
+ver 2
+net 192.168.23.0 
+net 192.168.23.4 
+
+end
+conf t
+ip domain-name cisco123
+username admin secret admin123
+username tux secret tux123
+crypto key generate rsa modul 1024
+ip ssh ver 2
+line vty 0 15
+transport input ssh
+login local 
+
+
+! --- Crear la ACL en el router 1 que no se conecten poe ssh
+! --- los del segmento D si puedan conectarse 
+
+access-list 1 remark admision_ssh
+access-list 1 permit 20.20.20.0 0.0.0.255
+
+! --- Aplicar la ACL en la interface virtual 
+
+line vty 0 15
+access-class 1 in
+do wr
+
+
+! --------------  router 2
+
+conf t
+interfa ser 2/0
+ip add 192.168.23.2 255.255.255.252
+no shut 
+interface gig1/0
+ip add 10.10.10.254 255.255.255.0
+no shut 
+
+interface gig3/0
+ip add 20.20.20.254 255.255.255.0
+no shut 
+
+router rip 
+vers 2
+net 10.10.10.0
+net 20.20.20.0
+net 192.168.23.0
+
+
+end
+conf t
+ip domain-name cisco123
+username admin secret admin123
+username tux secret tux123
+crypto key generate rsa modul 1024
+ip ssh ver 2
+line vty 0 15
+transport input ssh
+login local 
+
+
+! --- Crear la ACL en el router 1 que no se conecten poe ssh
+! --- los del segmento D si puedan conectarse 
+
+access-list 1 remark admision_ssh
+access-list 1 permit 20.20.20.0 0.0.0.255
+
+! --- Aplicar la ACL en la interface virtual 
+
+line vty 0 15
+access-class 1 in
+do wr
+
+
+
+! ---------- Router 3 
+
+conf term
+interfa ser2/1
+ip add 192.168.23.6 255.255.255.252
+no shut 
+
+interface gig1/0
+ip add 30.30.30.254 255.255.255.0
+no shut 
+interface gig3/0
+ip add 40.40.40.254 255.255.255.0
+no shut 
+
+router rip 
+ver 2
+
+net 30.30.30.0
+net 40.40.40.0
+net 192.168.23.4
+
+
+end
+conf t
+ip domain-name cisco123
+username admin secret admin123
+username tux secret tux123
+crypto key generate rsa modul 1024
+ip ssh ver 2
+line vty 0 15
+transport input ssh
+login local 
+
+
+! --- Crear la ACL en el router 1 que no se conecten poe ssh
+! --- los del segmento D si puedan conectarse 
+
+access-list 1 remark admision_ssh
+access-list 1 permit 20.20.20.0 0.0.0.255
+
+! --- Aplicar la ACL en la interface virtual 
+
+line vty 0 15
+access-class 1 in
+do wr
+
+
+!-------------------  ACL estandar --------------------------------
+
+Problema 1:
+La PC1 no tendra acceso a las subredes D y E 
+
+
+! --- Configuracion de la ACL Problema No.1 
+
+! --- ACL router 2 puerto Gig3/0
+! --- remark es para etiquetar
+! --- Tenemos que declarar un permit de lo contrario denegara a todos
+! --- permit any permite el paso a todos menos al host bloqueado
+! --- Si tenemos duda usaremos el ? 
+! --- out salida 
+! --- in entrada 
+
+
+! --- Crear la ACL en el router 2
+
+conf term 
+access-list 1 remark ACL Problema_1
+access-list 1 deny host 10.10.10.1
+access-list 1 permit any
+
+! --- Aplicar la ACL en la interface mas cercana al destino
+
+interface gig3/0
+ip access-group 1 out 
+
+
+! --- Crear la ACL en el router 3
+
+conf term 
+access-list 1 remark ACL Problema_1
+access-list 1 deny host 10.10.10.1
+access-list 1 permit any
+
+! --- Aplicar la ACL en la interface mas cercana al destino
+
+interface gig1/0
+ip access-group 1 out 
+
+
+
+
+
+Problema 2: 
+La PC2 no tendra aceeso a la subred F
+
+! --- Crear la ACL en el router 3
+
+conf term 
+access-list 2 remark ACL Problema_2
+access-list 2 deny host 10.10.10.2
+access-list 2 permit any
+
+! --- Aplicar la ACL en la interface mas cercana al destino
+
+interface gig3/0
+ip access-group 2 out 
+
+
+
+
+
+
+!----- Quitar la ACL del problema 2 en el router 3
+
+
+! Denegar el acceso a una subred 
+
+Problema 3:
+El segmento D no tendra acceso a la subred E
+Al bloquear un subred pide la marscara de wilecard
+
+ --- Crear la ACL en el router 3
+
+conf term 
+access-list 3 remark ACL Problema_3
+access-list 3 deny 20.20.20.0 0.0.0.255
+access-list 3 permit any
+
+! --- Aplicar la ACL en la interface mas cercana al destino
+
+interface gig1/0
+ip access-group 3 out 
+
+
+
+
+
+
+Problema 4:
+Todos los dispositivos de la subred F no tendran acceso al segmento C
+
+ --- Crear la ACL en el router 2
+
+conf term 
+access-list 2 remark ACL Problema_4
+access-list 2 deny 40.40.40.0 0.0.0.255
+access-list 2 permit any
+
+! --- Aplicar la ACL en la interface mas cercana al destino
+
+interface gig1/0
+ip access-group 2 out 
+
+

@@ -1,0 +1,4 @@
+Levantar doccker en caso de que no arranque 
+
+sudo systemctl restart docker
+docker start portainer
