@@ -1,1 +1,1 @@
-# Escalabilidad_de_redes
+![Topologia B](Resources/img/2.png)
