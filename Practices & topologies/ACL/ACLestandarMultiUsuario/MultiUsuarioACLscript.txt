@@ -1,0 +1,184 @@
+Subred D
+
+auto eth0
+iface eth0 inet dhcp
+
+Subred E
+
+auto eth0
+iface eth0 inet dhcp
+
+Subred F
+
+auto eth0
+iface eth0 inet dhcp
+
+
+! ----  router 4
+
+conf term 
+enable secret cisco123
+interface gig1/0
+ip helper-address 172.17.17.1
+ip add 13.13.13.254 255.255.255.0
+no shut 
+
+interface gig3/0
+ip helper-address 172.17.17.1
+ip add 14.14.14.254 255.255.255.0
+no shut 
+
+interface gig4/0
+ip helper-address 172.17.17.1
+ip add 15.15.15.254 255.255.255.0
+no shut 
+ 
+ 
+router ospf 1
+network 192.168.8.8 0.0.0.3 area 0
+network 13.13.13.0 0.0.0.255 area 0
+network 14.14.14.0 0.0.0.255 area 0
+network 15.15.15.0 0.0.0.255 area 0
+
+interface fa0/0
+ip add 192.168.8.10 255.255.255.252
+no shut 
+ 
+
+
+ip domain-name mexas.mx
+username admin secret admin123
+username tux123 secret tux123
+crypto key generate  rsa modul 1024
+line vty 0 15 
+login local 
+transport input ssh 
+ip ssh ver 2
+do wr 
+
+
+
+
+-------------------------------------------------------- prueba 
+
+
+
+
+! ----  router abajo fa
+
+conf term 
+enable secret cisco123
+
+interface fa0/0
+ip add 192.168.8.9 255.255.255.252
+no shut 
+
+interface ser2/0
+ip address 192.168.8.5 255.255.255.252
+clock rate 64000
+no shut
+ 
+ 
+router ospf 1
+network 192.168.8.8 0.0.0.3 area 0
+network 192.168.8.4 0.0.0.3 area 0
+
+
+ip domain-name mexas.mx
+username admin secret admin123
+username tux123 secret tux123
+crypto key generate  rsa modul 1024
+line vty 0 15 
+login local 
+transport input ssh 
+ip ssh ver 2
+do wr 
+
+
+-------------------------------------------------------------- nube 
+
+
+conf term 
+enable secret cisco123
+
+interface fa0/0
+ip add 192.168.8.2 255.255.255.252
+no shut 
+
+interface ser2/0
+ip address 192.168.8.6 255.255.255.252
+no shut
+ 
+ 
+router ospf 1
+network 192.168.8.0 0.0.0.3 area 0
+network 192.168.8.4 0.0.0.3 area 0
+
+
+ip domain-name mexas.mx
+username admin secret admin123
+username tux123 secret tux123
+crypto key generate  rsa modul 1024
+line vty 0 15 
+login local 
+transport input ssh 
+ip ssh ver 2
+do wr 
+
+
+
+
+Problema 2:
+impedir que los dispositivos de la Subred D (13.13.13.0/24) accedan a la Subred F (15.15.15.0/24), conservando el acceso al resto de las redes.
+Al bloquear un subred pide la marscara de wilecard
+
+ --- Crear la ACL en el router donde se conectan todos los clientes 
+
+conf term 
+access-list 2 remark ACL Problema2
+access-list 2 deny 13.13.13.0 0.0.0.255
+access-list 2 permit any
+
+! --- Aplicar la ACL en la interface mas cercana al destino
+
+interface gig4/0
+ip access-group 2 out 
+
+
+
+
+Problema 3:
+impedir que los dispositivos de la Subred F accedan a la Subred D, manteniendo el acceso a los demás segmentos.
+
+ --- Crear la ACL en el router donde se conectan todos los clientes 
+
+conf term 
+access-list 3 remark ACL Problema3
+access-list 3 deny 15.15.15.0 0.0.0.255
+access-list 3 permit any
+
+! --- Aplicar la ACL en la interface mas cercana al destino
+
+interface gig1/0
+ip access-group 3 out 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@
+
+

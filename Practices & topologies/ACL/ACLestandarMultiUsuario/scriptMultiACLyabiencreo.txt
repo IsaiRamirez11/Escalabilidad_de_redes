@@ -1,0 +1,712 @@
+
+
+---- servidor dhcp 
+
+auto eth0
+iface eth0 inet static
+	address 20.20.20.1
+	netmask 255.255.255.0
+	gateway 20.20.20.254
+
+
+
+
+----- servidor web nginx (/etc/network/interfaces) ----
+
+auto eth0
+iface eth0 inet static
+	address 20.20.20.2
+	netmask 255.255.255.0
+	gateway 20.20.20.254
+
+
+---- servidor dhcp: configuracion del servicio ----
+
+echo "" > /etc/dhcp/dhcpd.conf
+nano /etc/dhcp/dhcpd.conf
+
+archivo:
+
+authoritative;
+
+subnet 20.20.20.0 netmask 255.255.255.0
+{
+}
+
+subnet 10.10.10.0 netmask 255.255.255.0
+{
+    range 10.10.10.11 10.10.10.100;
+    option routers 10.10.10.254;
+   # option domain-name-servers 20.20.20.254;
+    option domain-name "isai.mx";
+    option broadcast-address 10.10.10.255;
+    default-lease-time 600;
+    max-lease-time 7200;
+}
+
+levantar servicio:
+
+service isc-dhcp-server start
+service isc-dhcp-server status
+
+! solo si status dice que NO esta corriendo:
+! abre este archivo y deja la linea asi: INTERFACESv4="eth0"
+nano /etc/default/isc-dhcp-server
+service isc-dhcp-server restart
+
+
+# =====================================================
+# ROUTERS
+# =====================================================
+
+---------- ROUTER 1 ---------
+
+conf term
+hostname R1
+no ip domain-lookup
+
+! quitar la subinterfaz vieja (dot1Q 20)
+no interface gig1/0.20
+
+interface gig1/0
+ip address 10.10.10.254 255.255.255.0
+ip helper-address 20.20.20.1
+no shut
+exit
+
+interface ser2/0
+ip address 192.168.45.1 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/1
+ip address 192.168.45.21 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.1 255.255.255.255
+exit
+
+router eigrp 100
+! se desactivar el auto summary
+no auto-summary
+! quitar la red classful vieja (si ya la tenias; si marca error, ignorar)
+no network 10.10.10.0
+network 10.10.10.0 0.0.0.255
+network 192.168.45.0 0.0.0.3
+network 192.168.45.20 0.0.0.3
+network 172.16.255.1 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+---------- ROUTER 2 ---------
+
+conf term
+hostname R2
+no ip domain-lookup
+
+interface ser2/0
+ip address 192.168.45.2 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/1
+ip address 192.168.45.5 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.2 255.255.255.255
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.0 0.0.0.3
+network 192.168.45.4 0.0.0.3
+network 172.16.255.2 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+---------- ROUTER 3 ---------
+
+conf term
+hostname R3
+no ip domain-lookup
+
+interface ser2/1
+ip address 192.168.45.6 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/0
+ip address 192.168.45.9 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.3 255.255.255.255
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.4 0.0.0.3
+network 192.168.45.8 0.0.0.3
+network 172.16.255.3 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+---------- ROUTER 4 ---------
+
+conf term
+hostname R4
+no ip domain-lookup
+
+interface gig1/0
+ip address 20.20.20.254 255.255.255.0
+no shut
+exit
+
+interface ser2/0
+ip address 192.168.45.10 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/1
+ip address 192.168.45.13 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.4 255.255.255.255
+exit
+
+router eigrp 100
+no auto-summary
+! IMPORTANTE: anunciar la red del datacenter (antes faltaba)
+network 20.20.20.0 0.0.0.255
+network 192.168.45.8 0.0.0.3
+network 192.168.45.12 0.0.0.3
+network 172.16.255.4 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+---------- ROUTER 5 ---------
+! (el de abajo a la izquierda, conecta con R1 y R6)
+
+conf term
+hostname R5
+no ip domain-lookup
+
+interface ser2/0
+ip address 192.168.45.18 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/1
+ip address 192.168.45.22 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.5 255.255.255.255
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.16 0.0.0.3
+network 192.168.45.20 0.0.0.3
+network 172.16.255.5 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+username dino privilege 15 secret dino123
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+---------- ROUTER 6 ---------
+! (el de abajo a la derecha, conecta con R4 y R5)
+
+conf term
+hostname R6
+no ip domain-lookup
+
+interface ser2/1
+ip address 192.168.45.14 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/0
+ip address 192.168.45.17 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.6 255.255.255.255
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.12 0.0.0.3
+network 192.168.45.16 0.0.0.3
+network 172.16.255.6 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+username dino privilege 15 secret dino123
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+
+ssh dino@10.10.10.254     # R1  (contrasena: dino123)
+ssh dino@172.16.255.2     # R2
+ssh dino@172.16.255.3     # R3
+ssh dino@172.16.255.4     # R4
+ssh dino@172.16.255.5     # R5
+ssh dino@172.16.255.6     # R6
+
+! si el cliente se queja de algoritmos (IOS viejo):
+ssh -oKexAlgorithms=+diffie-hellman-group14-sha1 -oHostKeyAlgorithms=+ssh-rsa -c aes128-cbc dino@172.16.255.2
+
+! tambien puedes entrar a R1 y saltar a los demas desde ahi:
+ssh -l dino 172.16.255.4
+auto eth0
+iface eth0 inet static
+	address 20.20.20.2
+	netmask 255.255.255.0
+	gateway 20.20.20.254
+
+
+---- servidor dhcp: configuracion del servicio ----
+
+echo "" > /etc/dhcp/dhcpd.conf
+nano /etc/dhcp/dhcpd.conf
+
+archivo:
+
+authoritative;
+
+subnet 20.20.20.0 netmask 255.255.255.0
+{
+}
+
+subnet 10.10.10.0 netmask 255.255.255.0
+{
+    range 10.10.10.11 10.10.10.100;
+    option routers 10.10.10.254;
+   # option domain-name-servers 20.20.20.254;
+    option domain-name "isai.mx";
+    option broadcast-address 10.10.10.255;
+    default-lease-time 600;
+    max-lease-time 7200;
+}
+
+levantar servicio:
+
+service isc-dhcp-server start
+service isc-dhcp-server status
+
+! solo si status dice que NO esta corriendo:
+! abre este archivo y deja la linea asi: INTERFACESv4="eth0"
+nano /etc/default/isc-dhcp-server
+service isc-dhcp-server restart
+
+
+# =====================================================
+# ROUTERS
+# =====================================================
+
+---------- ROUTER 1 ---------
+
+conf term
+hostname R1
+no ip domain-lookup
+
+! quitar la subinterfaz vieja (dot1Q 20)
+no interface gig1/0.20
+
+interface gig1/0
+ip address 10.10.10.254 255.255.255.0
+ip helper-address 20.20.20.1
+no shut
+exit
+
+interface ser2/0
+ip address 192.168.45.1 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/1
+ip address 192.168.45.21 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.1 255.255.255.255
+exit
+
+router eigrp 100
+! se desactivar el auto summary
+no auto-summary
+! quitar la red classful vieja (si ya la tenias; si marca error, ignorar)
+no network 10.10.10.0
+network 10.10.10.0 0.0.0.255
+network 192.168.45.0 0.0.0.3
+network 192.168.45.20 0.0.0.3
+network 172.16.255.1 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+username dino privilege 15 secret dino123
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 15
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+---------- ROUTER 2 ---------
+
+conf term
+hostname R2
+no ip domain-lookup
+
+interface ser2/0
+ip address 192.168.45.2 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/1
+ip address 192.168.45.5 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.2 255.255.255.255
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.0 0.0.0.3
+network 192.168.45.4 0.0.0.3
+network 172.16.255.2 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+username dino privilege 15 secret dino123
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+---------- ROUTER 3 ---------
+
+conf term
+hostname R3
+no ip domain-lookup
+
+interface ser2/1
+ip address 192.168.45.6 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/0
+ip address 192.168.45.9 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.3 255.255.255.255
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.4 0.0.0.3
+network 192.168.45.8 0.0.0.3
+network 172.16.255.3 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+username dino privilege 15 secret dino123
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+---------- ROUTER 4 ---------
+
+conf term
+hostname R4
+no ip domain-lookup
+
+interface gig1/0
+ip address 20.20.20.254 255.255.255.0
+no shut
+exit
+
+interface ser2/0
+ip address 192.168.45.10 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/1
+ip address 192.168.45.13 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.4 255.255.255.255
+exit
+
+router eigrp 100
+no auto-summary
+! IMPORTANTE: anunciar la red del datacenter (antes faltaba)
+network 20.20.20.0 0.0.0.255
+network 192.168.45.8 0.0.0.3
+network 192.168.45.12 0.0.0.3
+network 172.16.255.4 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+username dino privilege 15 secret dino123
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+---------- ROUTER 5 ---------
+! (el de abajo a la izquierda, conecta con R1 y R6)
+
+conf term
+hostname R5
+no ip domain-lookup
+
+interface ser2/0
+ip address 192.168.45.18 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/1
+ip address 192.168.45.22 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.5 255.255.255.255
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.16 0.0.0.3
+network 192.168.45.20 0.0.0.3
+network 172.16.255.5 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+username dino privilege 15 secret dino123
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+---------- ROUTER 6 ---------
+! (el de abajo a la derecha, conecta con R4 y R5)
+
+conf term
+hostname R6
+no ip domain-lookup
+
+interface ser2/1
+ip address 192.168.45.14 255.255.255.252
+clock rate 64000
+no shut
+interface ser2/0
+ip address 192.168.45.17 255.255.255.252
+clock rate 64000
+no shut
+exit
+
+interface loopback0
+ip address 172.16.255.6 255.255.255.255
+exit
+
+router eigrp 100
+no auto-summary
+network 192.168.45.12 0.0.0.3
+network 192.168.45.16 0.0.0.3
+network 172.16.255.6 0.0.0.0
+exit
+
+! ---- SSH ----
+ip domain-name isai.mx
+username dino privilege 15 secret dino123
+enable secret dino123
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 30 0
+exit
+
+do wr
+
+
+# =====================================================
+# VERIFICAR
+# =====================================================
+
+! cualquier router: debe mostrar 2 vecinos (R4 muestra 2 tambien)
+show ip eigrp neighbors
+
+! Routing for Networks debe listar las redes que anunciaste
+show ip protocols
+
+! todos deben tener rutas D hacia las otras subredes, 10.10.10.0/24 y 20.20.20.0/24
+show ip route
+
+! R1: llegar al servidor DHCP (el relay depende de esto)
+ping 20.20.20.1 source gig1/0
+
+! R4: llegar a la red de los hosts
+ping 10.10.10.254
+
+! Desde Host01 (VPCS), para probar el DHCP
+ip dhcp
+
+! Desde Host02 (docker)
+dhclient -v eth0
+
+! Debe darte una IP entre 10.10.10.11 y 10.10.10.100
+
+
+# =====================================================
+# ENTRAR POR SSH DESDE EL SEGMENTO 10.10.10.0/24
+# (desde Host02; el VPCS no tiene cliente SSH)
+# =====================================================
+
+ssh dino@10.10.10.254     # R1  (contrasena: dino123)
+ssh dino@172.16.255.2     # R2
+ssh dino@172.16.255.3     # R3
+ssh dino@172.16.255.4     # R4
+ssh dino@172.16.255.5     # R5
+ssh dino@172.16.255.6     # R6
+
+! si el cliente se queja de algoritmos (IOS viejo):
+ssh -oKexAlgorithms=+diffie-hellman-group14-sha1 -oHostKeyAlgorithms=+ssh-rsa -c aes128-cbc dino@172.16.255.2
+
+! tambien puedes entrar a R1 y saltar a los demas desde ahi:
+ssh -l dino 172.16.255.4
