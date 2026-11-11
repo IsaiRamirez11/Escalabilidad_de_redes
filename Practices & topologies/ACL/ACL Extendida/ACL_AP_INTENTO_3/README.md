@@ -1,27 +1,24 @@
-
+# Scripts GNS3 — 23.0.0.0/8
 
 ![Topología](img/topologia.png)
 
-
 **Imágenes Docker ya configuradas:**
 
-- [Servidor DHCP — archivo .tar](https://github.com/IsaiRamirez11/Escalabilidad_de_redes/tree/main/Resources/Containers/ServidoresDHCP)
-- [Servidor DNS — archivo .tar](https://github.com/IsaiRamirez11/Escalabilidad_de_redes/tree/main/Resources/Containers/Servidores%20DNS)
+- [Servidor DHCP —  server-dns-ap-acl-3.tar](https://github.com/IsaiRamirez11/Escalabilidad_de_redes/tree/main/Resources/Containers/ServidoresDHCP)
+- [Servidor DNS — server-dhcp-ap-acl-3.tar](https://github.com/IsaiRamirez11/Escalabilidad_de_redes/tree/main/Resources/Containers/Servidores%20DNS)
 
+## Subneteo
 
-
-## Direccionamiento VLSM
-
-| Subred | Hosts | Red | Máscara | Gateway / uso |
-|---|---:|---|---|---|
-| E | 206 | 23.0.0.0/24 | 255.255.255.0 | RT-01: 23.0.0.254 |
-| H | 125 | 23.0.1.0/25 | 255.255.255.128 | RT-04: 23.0.1.126 |
-| G | 31 | 23.0.1.128/26 | 255.255.255.192 | RT-05: 23.0.1.190 |
-| F | 16 | 23.0.1.192/27 | 255.255.255.224 | RT-03: 23.0.1.222 |
-| A | 2 | 23.0.1.224/30 | 255.255.255.252 | RT-02 ↔ RT-03 |
-| B | 2 | 23.0.1.228/30 | 255.255.255.252 | RT-02 ↔ RT-04 |
-| C | 2 | 23.0.1.232/30 | 255.255.255.252 | RT-02 ↔ RT-05 |
-| D | 2 | 23.0.1.236/30 | 255.255.255.252 | RT-01 ↔ RT-02 |
+| Subred | Hosts | Red | Máscara | Usables | Broadcast |
+|---|---:|---|---|---|---|
+| E | 206 | 23.0.0.0/24 | 255.255.255.0 | 23.0.0.1–23.0.0.254 | 23.0.0.255 |
+| H | 125 | 23.0.1.0/25 | 255.255.255.128 | 23.0.1.1–23.0.1.126 | 23.0.1.127 |
+| G | 31 | 23.0.1.128/26 | 255.255.255.192 | 23.0.1.129–23.0.1.190 | 23.0.1.191 |
+| F | 16 | 23.0.1.192/27 | 255.255.255.224 | 23.0.1.193–23.0.1.222 | 23.0.1.223 |
+| A | 2 | 23.0.1.224/30 | 255.255.255.252 | 23.0.1.225–23.0.1.226 | 23.0.1.227 |
+| B | 2 | 23.0.1.228/30 | 255.255.255.252 | 23.0.1.229–23.0.1.230 | 23.0.1.231 |
+| C | 2 | 23.0.1.232/30 | 255.255.255.252 | 23.0.1.233–23.0.1.234 | 23.0.1.235 |
+| D | 2 | 23.0.1.236/30 | 255.255.255.252 | 23.0.1.237–23.0.1.238 | 23.0.1.239 |
 
 # conexiones:
 
@@ -43,42 +40,39 @@
 | RT-02 ser2/3 | RT-05 ser2/3 |
 | RT-05 gig1/0 | Cloud1 enp3s0 |
 
-
-
 ## Routers
-
-
 
 ### RT-01
 
 ```
 conf term
-enable secret CiscoEnable
+hostname RT-01
+ena secret CiscoEnable
 service password-encryption
-banner motd #ACCESO RESTRINGIDO SOLO PERSONAL AUTORIZADO#
-line console 0
+banner motd # Acceso denegado #
+line con 0
 password CiscoConsole
 login
 exit
-interface Gig1/0
-ip address 23.0.0.254 255.255.255.0
+int gig1/0
+ip add 23.0.0.254 255.255.255.0
 no shut
 exit
-interface Ser2/0
-ip address 23.0.1.237 255.255.255.252
+int s2/0
+ip add 23.0.1.237 255.255.255.252
 no shut
 exit
 router rip
-version 2
+ver 2
 no auto-summary
-network 23.0.0.0
+net 23.0.0.0
 exit
 ip domain-name networking.dev.mx
 username ADMIN secret admin12345
 username CISCO secret cisco12345
 username AUX secret aux12345
 crypto key generate rsa modulus 1024
-ip ssh version 2
+ip ssh ver 2
 line vty 0 15
 transport input ssh
 login local
@@ -86,46 +80,46 @@ exit
 end
 wr
 ```
-
 
 ### RT-02
 
 ```
 conf term
-enable secret CiscoEnable
+hostname RT-02
+ena secret CiscoEnable
 service password-encryption
-banner motd #ACCESO RESTRINGIDO SOLO PERSONAL AUTORIZADO#
-line console 0
+banner motd # Acceso denegado #
+line con 0
 password CiscoConsole
 login
 exit
-interface Ser2/0
-ip address 23.0.1.238 255.255.255.252
+int s2/0
+ip add 23.0.1.238 255.255.255.252
 no shut
 exit
-interface Ser2/1
-ip address 23.0.1.225 255.255.255.252
+int s2/1
+ip add 23.0.1.225 255.255.255.252
 no shut
 exit
-interface Serl2/2
-ip address 23.0.1.229 255.255.255.252
+int s2/2
+ip add 23.0.1.229 255.255.255.252
 no shut
 exit
-interface Serl2/3
-ip address 23.0.1.233 255.255.255.252
+int s2/3
+ip add 23.0.1.233 255.255.255.252
 no shut
 exit
 router rip
-version 2
+ver 2
 no auto-summary
-network 23.0.0.0
+net 23.0.0.0
 exit
 ip domain-name networking.dev.mx
 username ADMIN secret admin12345
 username CISCO secret cisco12345
 username AUX secret aux12345
 crypto key generate rsa modulus 1024
-ip ssh version 2
+ip ssh ver 2
 line vty 0 15
 transport input ssh
 login local
@@ -133,39 +127,39 @@ exit
 end
 wr
 ```
-
 
 ### RT-03
 
 ```
 conf term
-enable secret CiscoEnable
+hostname RT-03
+ena secret CiscoEnable
 service password-encryption
-banner motd #ACCESO RESTRINGIDO SOLO PERSONAL AUTORIZADO#
-line console 0
+banner motd # Acceso denegado #
+line con 0
 password CiscoConsole
 login
 exit
-interface Ser2/1
-ip address 23.0.1.226 255.255.255.252
-no shutdown
+int s2/1
+ip add 23.0.1.226 255.255.255.252
+no shut
 exit
-interface Gig1/0
-ip address 23.0.1.222 255.255.255.224
+int gig1/0
+ip add 23.0.1.222 255.255.255.224
 ip helper-address 23.0.0.1
-no shutdown
+no shut
 exit
 router rip
-version 2
+ver 2
 no auto-summary
-network 23.0.0.0
+net 23.0.0.0
 exit
 ip domain-name networking.dev.mx
 username ADMIN secret admin12345
 username CISCO secret cisco12345
 username AUX secret aux12345
 crypto key generate rsa modulus 1024
-ip ssh version 2
+ip ssh ver 2
 line vty 0 15
 transport input ssh
 login local
@@ -173,39 +167,39 @@ exit
 end
 wr
 ```
-
 
 ### RT-04
 
 ```
 conf term
-enable secret CiscoEnable
+hostname RT-04
+ena secret CiscoEnable
 service password-encryption
-banner motd #ACCESO RESTRINGIDO SOLO PERSONAL AUTORIZADO#
-line console 0
+banner motd # Acceso denegado #
+line con 0
 password CiscoConsole
 login
 exit
-interface Ser2/2
-ip address 23.0.1.230 255.255.255.252
-no shutdown
+int s2/2
+ip add 23.0.1.230 255.255.255.252
+no shut
 exit
-interface Gig1/0
-ip address 23.0.1.126 255.255.255.128
+int gig1/0
+ip add 23.0.1.126 255.255.255.128
 ip helper-address 23.0.0.1
-no shutdown
+no shut
 exit
 router rip
-version 2
+ver 2
 no auto-summary
-network 23.0.0.0
+net 23.0.0.0
 exit
 ip domain-name networking.dev.mx
 username ADMIN secret admin12345
 username CISCO secret cisco12345
 username AUX secret aux12345
 crypto key generate rsa modulus 1024
-ip ssh version 2
+ip ssh ver 2
 line vty 0 15
 transport input ssh
 login local
@@ -213,39 +207,39 @@ exit
 end
 wr
 ```
-
 
 ### RT-05
 
 ```
 conf term
-enable secret CiscoEnable
+hostname RT-05
+ena secret CiscoEnable
 service password-encryption
-banner motd #ACCESO RESTRINGIDO SOLO PERSONAL AUTORIZADO#
-line console 0
+banner motd # Acceso denegado #
+line con 0
 password CiscoConsole
 login
 exit
-interface Ser2/3
-ip address 23.0.1.234 255.255.255.252
-no shutdown
+int s2/3
+ip add 23.0.1.234 255.255.255.252
+no shut
 exit
-interface Gig1/0
-ip address 23.0.1.190 255.255.255.192
+int gig1/0
+ip add 23.0.1.190 255.255.255.192
 ip helper-address 23.0.0.1
-no shutdown
+no shut
 exit
 router rip
-version 2
+ver 2
 no auto-summary
-network 23.0.0.0
+net 23.0.0.0
 exit
 ip domain-name networking.dev.mx
 username ADMIN secret admin12345
 username CISCO secret cisco12345
 username AUX secret aux12345
 crypto key generate rsa modulus 1024
-ip ssh version 2
+ip ssh ver 2
 line vty 0 15
 transport input ssh
 login local
@@ -255,25 +249,25 @@ wr
 ```
 
 
+
 ## Switches
-
-
 
 ### SW-01
 
 ```
 ena
 conf term
-enable secret CiscoEnable
+hostname SW-01
+ena secret CiscoEnable
 service password-encryption
-banner motd #ACCESO RESTRINGIDO SOLO PERSONAL AUTORIZADO#
-line console 0
+banner motd # Acceso denegado #
+line con 0
 password CiscoConsole
 login
 exit
-interface Vlan1
-ip address 23.0.0.253 255.255.255.0
-no shutdown
+int vlan 1
+ip add 23.0.0.253 255.255.255.0
+no shut
 exit
 ip default-gateway 23.0.0.254
 ip domain-name networking.dev.mx
@@ -281,7 +275,7 @@ username ADMIN secret admin12345
 username CISCO secret cisco12345
 username AUX secret aux12345
 crypto key generate rsa modulus 1024
-ip ssh version 2
+ip ssh ver 2
 line vty 0 15
 transport input ssh
 login local
@@ -290,22 +284,22 @@ end
 wr
 ```
 
-
 ### SW-02
 
 ```
 ena
 conf term
-enable secret CiscoEnable
+hostname SW-02
+ena secret CiscoEnable
 service password-encryption
-banner motd #ACCESO RESTRINGIDO SOLO PERSONAL AUTORIZADO#
-line console 0
+banner motd # Acceso denegado #
+line con 0
 password CiscoConsole
 login
 exit
-interface Vlan1
-ip address 23.0.1.221 255.255.255.224
-no shutdown
+int vlan 1
+ip add 23.0.1.221 255.255.255.224
+no shut
 exit
 ip default-gateway 23.0.1.222
 ip domain-name networking.dev.mx
@@ -313,7 +307,7 @@ username ADMIN secret admin12345
 username CISCO secret cisco12345
 username AUX secret aux12345
 crypto key generate rsa modulus 1024
-ip ssh version 2
+ip ssh ver 2
 line vty 0 15
 transport input ssh
 login local
@@ -322,22 +316,22 @@ end
 wr
 ```
 
-
 ### SW-03
 
 ```
 ena
 conf term
-enable secret CiscoEnable
+hostname SW-03
+ena secret CiscoEnable
 service password-encryption
-banner motd #ACCESO RESTRINGIDO SOLO PERSONAL AUTORIZADO#
-line console 0
+banner motd # Acceso denegado #
+line con 0
 password CiscoConsole
 login
 exit
-interface Vlan1
-ip address 23.0.1.125 255.255.255.128
-no shutdown
+int vlan 1
+ip add 23.0.1.125 255.255.255.128
+no shut
 exit
 ip default-gateway 23.0.1.126
 ip domain-name networking.dev.mx
@@ -345,7 +339,7 @@ username ADMIN secret admin12345
 username CISCO secret cisco12345
 username AUX secret aux12345
 crypto key generate rsa modulus 1024
-ip ssh version 2
+ip ssh ver 2
 line vty 0 15
 transport input ssh
 login local
@@ -356,17 +350,52 @@ wr
 
 
 
+### ServerDHCP 
 
 
+```
+auto eth0
+iface eth0 inet static
+    address 23.0.0.1
+    netmask 255.255.255.0
+    gateway 23.0.0.254
+   
+```
 
+### ServerDNS 
+
+
+```
+auto eth0
+iface eth0 inet static
+    address 23.0.0.2
+    netmask 255.255.255.0
+    gateway 23.0.0.254
+
+```
+
+### ServerNGINX
+
+
+```
+auto eth0
+iface eth0 inet static
+    address 23.0.0.3
+    netmask 255.255.255.0
+    gateway 23.0.0.254
+   
+```
 
 
 ## ServerDHCP
 
 
-### `/etc/dhcp/dhcpd.conf`
 
-```conf
+```
+nano /etc/dhcp/dhcpd.conf
+```
+
+```
 subnet 23.0.0.0 netmask 255.255.255.0
 {
 }
@@ -405,23 +434,22 @@ subnet 23.0.1.192 netmask 255.255.255.224
 }
 ```
 
+---
 
-### `/etc/default/isc-dhcp-server`
+
 
 ```
-INTERFACESv4="eth0"
-INTERFACESv6=""
+service isc-dhcp-server restart
 ```
-
-
-
 
 ## ServerDNS
 
 
-### `/etc/bind/named.conf.local`
+```
+nano /etc/bind/named.conf.local
+```
 
-```conf
+```
 zone "devops.com.mx" {
     type master;
     file "/etc/bind/db.devops.com.mx";
@@ -434,90 +462,70 @@ zone "0.23.in-addr.arpa" {
 ```
 
 
-### `/etc/bind/db.devops.com.mx`
+
+```
+nano /etc/bind/db.devops.com.mx
+```
 
 ```
 $TTL 86400
 @ IN SOA dns.devops.com.mx. root.devops.com.mx. (
-    2026111001
+    2026111003
+    604800
+    86400
+    604800
+    86400
+)
+@       IN NS dns.devops.com.mx.
+@       IN A 23.0.0.3
+dns     IN A 23.0.0.2
+dns1    IN A 23.0.0.2
+dhcp    IN A 23.0.0.1
+nginx   IN A 23.0.0.3
+www     IN A 23.0.0.3
+www1    IN A 23.0.0.3
+```
+
+
+```
+nano /etc/bind/rev.23.0
+```
+
+```
+$TTL 86400
+@ IN SOA dns.devops.com.mx. root.devops.com.mx. (
+    2026111003
     604800
     86400
     604800
     86400
 )
 @ IN NS dns.devops.com.mx.
-@ IN A 23.0.0.3
-dns             IN A 23.0.0.2
-dhcp            IN A 23.0.0.1
-nginx           IN A 23.0.0.3
-www             IN A 23.0.0.3
-rt01            IN A 23.0.0.254
-rt01-d          IN A 23.0.1.237
-rt02            IN A 23.0.1.238
-rt02-a          IN A 23.0.1.225
-rt02-b          IN A 23.0.1.229
-rt02-c          IN A 23.0.1.233
-rt03            IN A 23.0.1.222
-rt03-a          IN A 23.0.1.226
-rt04            IN A 23.0.1.126
-rt04-b          IN A 23.0.1.230
-rt05            IN A 23.0.1.190
-rt05-c          IN A 23.0.1.234
-sw01            IN A 23.0.0.253
-sw02            IN A 23.0.1.221
-sw03            IN A 23.0.1.125
+1.0 IN PTR dhcp.devops.com.mx.
+2.0 IN PTR dns.devops.com.mx.
+3.0 IN PTR nginx.devops.com.mx.
 ```
 
 
-### `/etc/bind/rev.23.0`
-
 ```
-$TTL 86400
-@ IN SOA dns.devops.com.mx. root.devops.com.mx. (
-    2026111001
-    604800
-    86400
-    604800
-    86400
-)
-@ IN NS dns.devops.com.mx.
-1.0     IN PTR dhcp.devops.com.mx.
-2.0     IN PTR dns.devops.com.mx.
-3.0     IN PTR nginx.devops.com.mx.
-253.0   IN PTR sw01.devops.com.mx.
-254.0   IN PTR rt01.devops.com.mx.
-125.1   IN PTR sw03.devops.com.mx.
-126.1   IN PTR rt04.devops.com.mx.
-190.1   IN PTR rt05.devops.com.mx.
-221.1   IN PTR sw02.devops.com.mx.
-222.1   IN PTR rt03.devops.com.mx.
-225.1   IN PTR rt02-a.devops.com.mx.
-226.1   IN PTR rt03-a.devops.com.mx.
-229.1   IN PTR rt02-b.devops.com.mx.
-230.1   IN PTR rt04-b.devops.com.mx.
-233.1   IN PTR rt02-c.devops.com.mx.
-234.1   IN PTR rt05-c.devops.com.mx.
-237.1   IN PTR rt01-d.devops.com.mx.
-238.1   IN PTR rt02.devops.com.mx.
+nano /etc/bind/named.conf.options
 ```
-
-
-### `/etc/bind/named.conf.options`
 
 ```
 options {
     directory "/var/cache/bind";
+
     listen-on port 53 { 127.0.0.1; 23.0.0.2; };
     allow-query { 127.0.0.1; 23.0.0.0/8; };
     recursion yes;
     allow-recursion { 127.0.0.1; 23.0.0.0/8; };
+
     dnssec-validation auto;
     listen-on-v6 { none; };
 };
 ```
 
-
-### Permisos, validación e inicio de DNS
+### Permisos 
 
 ```
 chown root:bind /etc/bind/db.devops.com.mx /etc/bind/rev.23.0
@@ -525,13 +533,144 @@ chmod 644 /etc/bind/db.devops.com.mx /etc/bind/rev.23.0
 named-checkconf /etc/bind/named.conf
 named-checkzone devops.com.mx /etc/bind/db.devops.com.mx
 named-checkzone 0.23.in-addr.arpa /etc/bind/rev.23.0
+rndc reload
+```
+
+
+```
 named -u bind
 ```
 
 
 
+## Clientes Ubuntu 
+
+### UBUNTU-F-01 
+
+```
+auto eth0
+iface eth0 inet dhcp
+    
+```
+
+### UBUNTU-F-02 
 
 
 
+```
+auto eth0
+iface eth0 inet dhcp
+   
+```
 
+### UBUNTU-H-01
+
+
+
+```
+auto eth0
+iface eth0 inet dhcp
+  
+```
+
+### UBUNTU-H-02 
+
+
+```
+auto eth0
+iface eth0 inet dhcp
+    
+```
+
+## Pruebas
+
+### Routers
+
+```
+show ip int brief
+show ip route
+show ip protocols
+show ip ssh
+```
+
+### Ubuntu
+
+```
+dhclient -v eth0
+ip addr show eth0
+ip route
+cat /etc/resolv.conf
+ping 23.0.0.1
+ping 23.0.0.2
+ping 23.0.0.3
+ping www.devops.com.mx
+ping dns.devops.com.mx
+ping dns1.devops.com.mx
+ping dhcp.devops.com.mx
+```
+
+
+## SSH — desde Ubuntu
+
+
+
+### RT-01
+
+```
+ssh ADMIN@23.0.0.254
+```
+
+### RT-02
+
+```
+ssh ADMIN@23.0.1.238
+```
+
+### RT-03
+
+```
+ssh ADMIN@23.0.1.222
+```
+
+### RT-04
+
+```
+ssh ADMIN@23.0.1.126
+```
+
+### RT-05
+
+```
+ssh ADMIN@23.0.1.190
+```
+
+### SW-01
+
+```
+ssh ADMIN@23.0.0.253
+```
+
+### SW-02
+
+```
+ssh ADMIN@23.0.1.221
+```
+
+### SW-03
+
+```
+ssh ADMIN@23.0.1.125
+```
+
+**Después de iniciar sesión:**
+```
+ena
+```
+
+**Contraseña:** `CiscoEnable`
+
+**Desde otro Cisco:**
+```
+ssh -l ADMIN 23.0.0.254
+```
 
