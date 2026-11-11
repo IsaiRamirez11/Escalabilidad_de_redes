@@ -525,6 +525,18 @@ options {
 };
 ```
 
+!---------------------------
+
+named -u bind -c /etc/bind/named.conf
+
+ps aux | grep '[n]amed'
+
+ss -lntup | grep ':53'
+
+named-checkconf -z
+!-------------------------
+
+
 ### Permisos 
 
 ```
