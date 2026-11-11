@@ -1,0 +1,110 @@
+Desaplicar ACLs
+
+
+el ip engloba a todos los servicios explicar 
+
+
+El dispositivo 2 de la subred D no podra acceder al servicio web 1  de la subred F 
+
+! ------ Problema 1 -  Router 2 
+
+! ----- Crear ACL extendida -----
+
+conf term
+access-list 100 remark BLOQUEAR-HOST02-WEB1
+access-list 100 deny tcp host 20.20.20.2 host 40.40.40.1 eq www
+access-list 100 permit ip host 20.20.20.2 any
+interface gig3/0
+ip access-group 100 in
+
+! -------------------------------
+
+
+pruebas desde el hosst 2 de la subred D 
+
+ping 40.40.40.1
+
+ese ping debe de llegar 
+
+curl 40.40.40.1 
+
+no debe de consumirse el servicio 
+
+
+
+
+
+
+
+
+! ------- Problema 2 - router 2
+
+La PC2 del segmento C no podra realizar pruebas de conectividad con la subred E
+
+cuando se bloque toda la subred no va palabras clave y va solo la subred con la mascara de wilcard 
+
+echo = ping
+any any significa de cualquiera a cualquiera 
+
+!primero se pone lo que se quiera bloquear siempre hasta el ultimo los permit
+
+! ----- Crear ACL extendida -----
+
+conf term
+access-list 101 remark BLOQUEAR-CONECTIVIDAD-PC2-SUB-E
+access-list 101 deny icmp host 10.10.10.2 30.30.30.0 0.0.0.255 echo
+
+! -- Para mas Negaciones --
+
+! access-list 101 deny icmp host 10.10.10.2 30.30.30.0 0.0.0.255 echo
+
+! access-list 101 deny icmp host 10.10.10.2 30.30.30.0 0.0.0.255 echo  
+
+
+! -- Los permit 
+
+! --------------------------------
+access-list 101 permit ip any any
+!---------------------------------
+
+! -- Aplicarla en la interfaz correspondiente --
+
+interface gig1/0
+ip access-group 101 in
+
+! -------------------------------
+
+
+
+
+
+! ----------------------
+! ----------------------
+! ----- Editar ACL -----
+! ----------------------
+!-----------------------
+
+! Comando para ingresar al modo editar la ACL extendida 
+
+! ip access-list extende 101
+
+! para eliminar primero ver el numero que corresponde a la linea a corregir 
+
+! do show access-l 101
+
+! para eliminar se ocupa el no y el numero que corresponde a la linea que queremos eliminar 
+
+! no 30 
+
+! para agregar lienas en la ACL verificar una linea no ocupada 
+
+! 40 comando que queramos
+
+! si agegamos en alguna linea ya ocupada se sobreescribe esa linea con la nueva instruccion 
+
+
+
+
+
+
+
